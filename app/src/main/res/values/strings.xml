@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Weather APP</string>
+    <string name="weatherbackground">weatherBackground</string>
+    <string name="changebutton">changeButton</string>
+    <string name="na">NA</string>
+    <string name="fetching_location">Fetching Location</string>
+    <string name="weathericon">weatherIcon</string>
+    <string name="change_city">Change City</string>
+    <string name="changecitybackground">changeCityBackground</string>
+    <string name="backbutton">backButton</string>
+    <string name="enter_city_name">Enter City Name</string>
 </resources>
