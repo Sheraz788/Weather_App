@@ -19,7 +19,7 @@
         app:srcCompat="@drawable/weather_background" />
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/cityChangeBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -33,7 +33,7 @@
         app:srcCompat="@drawable/change_city_symbol_small" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/locationName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -50,7 +50,7 @@
         app:layout_constraintVertical_bias="0.512" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/cityTemp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -60,7 +60,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.737"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageButton" />
+        app:layout_constraintTop_toBottomOf="@+id/cityChangeBtn" />
 
     <FrameLayout
         android:id="@+id/frameLayout"
@@ -70,15 +70,15 @@
         android:layout_marginStart="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView">
+        app:layout_constraintTop_toBottomOf="@id/cityTemp">
 
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/weatherIcon"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:contentDescription="@string/weathericon"
             android:scaleType="center"
-            app:srcCompat="@drawable/dunno"
-            android:contentDescription="@string/weathericon" />
+            app:srcCompat="@drawable/dunno" />
     </FrameLayout>
 
 

@@ -1,6 +1,7 @@
 package com.sheraz.ali.weather_app
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
@@ -9,19 +10,20 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.util.Log
+import android.widget.Toast
 
 import com.loopj.android.http.AsyncHttpClient
 import com.loopj.android.http.JsonHttpResponseHandler
 import com.loopj.android.http.RequestParams
+import com.sheraz.ali.weather_app.Utilities.*
 
-import com.sheraz.ali.weather_app.Utilities.MIN_DISTANCE
-import com.sheraz.ali.weather_app.Utilities.MIN_TIME
-import com.sheraz.ali.weather_app.Utilities.REQUEST_CODE
-import com.sheraz.ali.weather_app.Utilities.WEATHER_URL
 import cz.msebera.android.httpclient.Header
+import kotlinx.android.synthetic.main.activity_change_city.*
+import kotlinx.android.synthetic.main.activity_weather_controller.*
 import org.json.JSONObject
 
 class WeatherControllerActivity : AppCompatActivity() {
+
 
 
     //Location Provider
@@ -37,12 +39,41 @@ class WeatherControllerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather_controller)
 
+
+        cityChangeBtn.setOnClickListener {
+            val changeCityIntent = Intent(this, change_city::class.java)
+            startActivity(changeCityIntent)
+        }
+
     }
 
     override fun onResume() {
         super.onResume()
 
-        getWeatherForCurrentLocation();
+        val city= intent
+        val cityName = city.getStringExtra("cityName")
+
+        if(cityName != null){
+
+            Log.d("Weather", "onResume() called getting weather for new City")
+            updateCityName(cityName)
+
+        }else{
+
+            Log.d("Weather", "onResume() called getting weather for current location")
+            getWeatherForCurrentLocation()
+
+        }
+
+    }
+
+    private fun updateCityName(city : String){
+
+        val params = RequestParams()
+        params.put("q", city)
+        params.put("appid", APP_ID)
+        letDoNetworking(params)
+
     }
 
     private fun getWeatherForCurrentLocation() {
@@ -59,8 +90,9 @@ class WeatherControllerActivity : AppCompatActivity() {
                 val latitude = location?.latitude.toString()
 
                 val params = RequestParams()
-                params.put("log", longitude)
+                params.put("lon", longitude)
                 params.put("lat", latitude)
+                params.put("appid", APP_ID)
                 letDoNetworking(params)
 
             }
@@ -98,7 +130,7 @@ class WeatherControllerActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if(requestCode == REQUEST_CODE){
-            if(permissions.size > 0 && grantResults[0] != PackageManager.PERMISSION_DENIED){
+            if(permissions.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_DENIED){
                 Log.d("weather", "Success : Permission Granted")
             }else{
                 Log.d("weather", "Failed : Permission Denied")
@@ -109,26 +141,48 @@ class WeatherControllerActivity : AppCompatActivity() {
     }
 
     //Networking
-    fun letDoNetworking(params : RequestParams){
+    private fun letDoNetworking(params : RequestParams){
 
         val client = AsyncHttpClient()
 
         client.get(WEATHER_URL, params, object : JsonHttpResponseHandler(){
 
-            override fun onSuccess(statusCode: Int, headers: Array<out Header>?, response: JSONObject?) {
+            override fun onSuccess(statusCode: Int, headers: Array<out Header>?, response: JSONObject) {
                 super.onSuccess(statusCode, headers, response)
 
                 Log.d("WEATHER JSON", response.toString())
 
-
+                val weather = WeatherDataModel()
+                val returnData = weather.fromJSON(response)
+                updateUI(returnData)
             }
 
             override fun onFailure(statusCode: Int, headers: Array<out Header>?, throwable: Throwable?, errorResponse: JSONObject?) {
                 super.onFailure(statusCode, headers, throwable, errorResponse)
 
+                Log.d("Weather", "Failed" + throwable.toString())
+                Log.d("Weather", "Status Code $statusCode")
+                Log.d("Weather" , "Response Error + $errorResponse")
+
+                Toast.makeText(this@WeatherControllerActivity, "", Toast.LENGTH_LONG).show()
 
             }
+
+
         })
+
+    }
+
+
+    fun updateUI(weatherData: WeatherDataModel){
+
+
+        cityTemp.text = weatherData.cityTemperature()
+
+        val resourceID = resources.getIdentifier(weatherData.weatherIcon(), "drawable", packageName)
+        weatherIcon.setImageResource(resourceID)
+
+        locationName.text = weatherData.cityName()
 
     }
 
